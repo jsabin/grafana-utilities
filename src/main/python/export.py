@@ -97,7 +97,7 @@ def convertToPermissionField(role):
 
 
 if len(sys.argv) < 4:
-    print 'Usage: export <grafanaURL> <folder> <apiKey>'
+    print 'Usage: export.py <grafanaURL> <folder> <apiKey>'
     sys.exit(1)
 
 url = sys.argv[1]

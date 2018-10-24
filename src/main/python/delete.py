@@ -43,7 +43,7 @@ def delete_dashboard(url, key, id):
 
 
 if len(sys.argv) < 3:
-    print 'Usage: delete <grafanaURL> <apiKey>'
+    print 'Usage: delete.py <grafanaURL> <apiKey>'
     sys.exit(1)
 
 url = sys.argv[1]

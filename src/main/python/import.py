@@ -37,7 +37,7 @@ def getFolderId(url, key, folderName):
 
 
 if len(sys.argv) < 5:
-    print 'Usage: import <grafanaURL> <dashboardDir> <org> <folder> <apiKey>'
+    print 'Usage: import.py <grafanaURL> <dashboardDir> <org> <folder> <apiKey>'
     sys.exit(1)
 
 url = sys.argv[1]
@@ -68,7 +68,7 @@ for file in os.listdir(dirName):
     except urllib2.HTTPError as e:
         print 'failed with error %s' % e.getcode()
 
-print '\nImporting datatsources...'
+print '\nImporting datasources...'
 dirName = '%s/%s/datasources' % (dashboardDir, org)
 for file in os.listdir(dirName):
     try:
