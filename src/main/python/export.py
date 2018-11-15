@@ -7,6 +7,7 @@ import urllib2
 import os
 import errno
 
+
 # Exports Dashboards, Datasources, and org permissions
 
 
@@ -85,6 +86,7 @@ def mkdir(path):
         else:
             raise
 
+
 def convertToPermissionField(role):
     if role.lower() == "viewer":
         return 1
@@ -94,6 +96,12 @@ def convertToPermissionField(role):
         return 4
     else:
         raise Exception('Invalid permission role %s' % role)
+
+
+def setDefaultDatasource(dict):
+    if 'datasource' in dict and not dict['datasource']:
+        dict['datasource'] = defaultDataSource
+    return dict
 
 
 if len(sys.argv) < 4:
@@ -107,30 +115,35 @@ key = sys.argv[3]
 orgName = getOrgName(url, key)
 folder = os.path.join(folder, orgName)
 
+print '\nExporting Datasources'
+defaultDataSource = ''
+datasources = getList(url + '/api/datasources', key)
+for datasource in datasources:
+    print datasource['name']
+    datasourceJson = json.load(get_datasource(url, key, datasource['id']))
+    if datasourceJson['isDefault']:
+        defaultDataSource = datasourceJson['name']
+
+    outDir = os.path.join(folder, "datasources", )
+    mkdir(outDir)
+    with open(os.path.join(outDir, datasource['name'] + '.json'), "w") as outFile:
+        json.dump(datasourceJson, outFile, indent=4)
+
 dashboards = getList(url + '/api/search?query=&', key)
 print 'Exporting dashboards...'
 for dash in dashboards:
     if dash['type'] == 'dash-db':
         dashName = dash['title']
         print dashName
-        dashboardJson = json.load(get_dashboard(url, key, dash['uri']))
+        dashboardJson = json.load(get_dashboard(url, key, dash['uri']), object_hook=setDefaultDatasource)
         removeProperties(dashboardJson)
+
+        # If using the default datasource (null) then set to the name of default. Because this could be different than the default in the org moving to
 
         outDir = os.path.join(folder, "dashboards")
         mkdir(outDir)
         with open(os.path.join(outDir, dashName + '.json'), "w") as outFile:
             json.dump(dashboardJson, outFile, indent=4)
-
-print '\nExporting Datasources'
-datasources = getList(url + '/api/datasources', key)
-for datasource in datasources:
-    print datasource['name']
-    datasourceJson = json.load(get_datasource(url, key, datasource['id']))
-
-    outDir = os.path.join(folder, "datasources", )
-    mkdir(outDir)
-    with open(os.path.join(outDir, datasource['name'] + '.json'), "w") as outFile:
-        json.dump(datasourceJson, outFile, indent=4)
 
 print '\nExporting Permissions'
 users = getList(url + '/api/org/users', key)
@@ -138,7 +151,7 @@ items = []
 for user in users:
     print user['login']
     permission = convertToPermissionField(user['role'])
-    items.append({'userId' : user['userId'], 'permission': permission})
+    items.append({'userId': user['userId'], 'permission': permission})
 
 with open(os.path.join(folder, 'permissions.json'), "w") as outFile:
-    json.dump({'items':items}, outFile, indent=4)
+    json.dump({'items': items}, outFile, indent=4)
