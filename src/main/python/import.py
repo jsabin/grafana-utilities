@@ -20,6 +20,9 @@ def import_data(url, data, key):
 
 
 def getFolderId(url, key, folderName):
+    if folderName == "General":
+        return {'id': 0}
+
     req = urllib2.Request(url + '/api/search')
     req.add_header('Content-Type', 'application/json')
     req.add_header('authorization', 'Bearer %s' % key)
@@ -48,7 +51,7 @@ key = sys.argv[5]
 
 folder = getFolderId(url, key, folderName)
 folderId = folder['id']
-if not folderId:
+if folderName != "General" and not folderId:
     print "Could not find folder id for folder %s" % folderName
     sys.exit(1)
 
