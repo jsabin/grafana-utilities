@@ -130,9 +130,9 @@ for datasource in datasources:
         json.dump(datasourceJson, outFile, indent=4)
 
 dashboards = getList(url + '/api/search?query=&', key)
-print 'Exporting dashboards...'
+print '\nExporting dashboards...'
 for dash in dashboards:
-    if dash['type'] == 'dash-db':
+    if dash['type'] == 'dash-db' and len(dash['title']) > 0:
         dashName = dash['title']
         print dashName
         dashboardJson = json.load(get_dashboard(url, key, dash['uri']), object_hook=setDefaultDatasource)
@@ -142,7 +142,9 @@ for dash in dashboards:
 
         outDir = os.path.join(folder, "dashboards")
         mkdir(outDir)
-        with open(os.path.join(outDir, dashName + '.json'), "w") as outFile:
+        filename = '%s.json' % dashName
+        filename = filename.replace("/", "-") # Replace slashes with dash
+        with open(os.path.join(outDir, filename), "w") as outFile:
             json.dump(dashboardJson, outFile, indent=4)
 
 print '\nExporting Permissions'
