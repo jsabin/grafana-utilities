@@ -23,7 +23,7 @@ def getFolderId(url, key, folderName):
     if folderName == "General":
         return {'id': 0}
 
-    req = urllib2.Request(url + '/api/search')
+    req = urllib2.Request(url + '/api/search?type=dash-folder')
     req.add_header('Content-Type', 'application/json')
     req.add_header('authorization', 'Bearer %s' % key)
     context = ssl.SSLContext(
@@ -32,7 +32,7 @@ def getFolderId(url, key, folderName):
 
     folders = json.load(result)
     for folder in folders:
-        if folder['type'] == 'dash-folder' and folder['title'] == folderName:
+        if folder['title'] == folderName:
             return {'id': folder['id'], 'uid': folder['uid']}
 
     if result:
